@@ -23,7 +23,8 @@ public class CreatePolygonMesh : MonoBehaviour {
 	public float delta_distance;
 	public float weight2;
 	public float noise_factor = 1.0f;
-	
+	public int noise_selection = 0;
+
 	//timer
 	private float timer;
 	private float waitingTime=0.01f;
@@ -97,8 +98,6 @@ public class CreatePolygonMesh : MonoBehaviour {
 			//距離が短すぎる場合
 			delta_distance = Vector3.Distance(pos, newpos);
 			pos = newpos;
-			newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
-
 
 			if(delta_distance < 0.1f)
 			{
@@ -106,11 +105,27 @@ public class CreatePolygonMesh : MonoBehaviour {
 			}
 			//アクティブな場合
 			timer = 0;
-
+			
 			if(delta_distance > 0.3f){
 				drawing = true;
 			}
-			
+
+
+			switch(noise_selection)
+			{
+			case 0:
+					break;
+			case 1:
+					newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
+					break;
+			case 2:
+					Vector3 noise = noise_factor*Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.z)*(newpos.normalized);
+					noise = new Vector3(noise.x, 0.0f, noise.z);
+					newpos += noise;
+					break;
+			}
+
+
 			Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
 			int pathcount = path.Count-1;
 			path.Enqueue(newpos);
