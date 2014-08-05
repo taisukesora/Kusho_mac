@@ -87,7 +87,7 @@ public class CubemanController : MonoBehaviour
 		
 		// array holding the skeleton lines
 		lines = new LineRenderer[bones.Length];
-		
+		/*
 		if(LinePrefab)
 		{
 			for(int i = 0; i < lines.Length; i++)
@@ -110,6 +110,7 @@ public class CubemanController : MonoBehaviour
 		
 		initialPosition = transform.position;
 		initialRotation = transform.rotation;
+		*/
 	}
 	
 
@@ -135,11 +136,13 @@ public class CubemanController : MonoBehaviour
 
 				bones[i].transform.localPosition = Vector3.zero;
 				bones[i].transform.localRotation = Quaternion.identity;
-				
+
+				/*
 				if(LinePrefab)
 				{
 					lines[i].gameObject.SetActive(false);
 				}
+				*/
 			}
 			
 			return;
@@ -184,7 +187,8 @@ public class CubemanController : MonoBehaviour
 
 					bones[i].transform.localPosition = posJoint;
 					bones[i].transform.localRotation = rotJoint;
-					
+
+					/*
 					if(LinePrefab)
 					{
 						lines[i].gameObject.SetActive(true);
@@ -198,6 +202,7 @@ public class CubemanController : MonoBehaviour
 						lines[i].SetPosition(0, posParent);
 						lines[i].SetPosition(1, posJoint2);
 					}
+					*/
 
 //					KinectInterop.BodyData bodyData = manager.GetUserBodyData(userID);
 //					if(lineTLeft != null && bodyData.liTrackingID != 0 && joint == (int)JointType.HandLeft)
@@ -251,11 +256,12 @@ public class CubemanController : MonoBehaviour
 				else
 				{
 					bones[i].gameObject.SetActive(false);
-					
+					/*
 					if(LinePrefab)
 					{
 						lines[i].gameObject.SetActive(false);
 					}
+					*/
 				}
 			}	
 		}
