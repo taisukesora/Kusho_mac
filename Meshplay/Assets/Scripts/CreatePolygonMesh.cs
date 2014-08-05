@@ -33,15 +33,16 @@ public class CreatePolygonMesh : MonoBehaviour {
 		basevec = new Vector3[sections];
 		mesh = new Mesh();    
 		//初期path
-		path.Enqueue(new Vector3(0.0f, 0.0f, 0.0f));
-		
+		path.Enqueue(RightHand.transform.position);
+
 		//点の設定
 		for(int i=0;i<sections;i++){
 			basevec[i] = new Vector3(0.0f, Mathf.Cos (2*Mathf.PI*i/sections), Mathf.Sin(2*Mathf.PI*i/sections));
 		}
+
 		for(int i=0;i<sections;i++)
 		{
-			newVertices.Enqueue(basevec[i]);
+			newVertices.Enqueue(path.Peek() + basevec[i]);
 			newUV.Enqueue(new Vector2(i/sections, 0.0f));
 		}
 		
@@ -99,7 +100,10 @@ public class CreatePolygonMesh : MonoBehaviour {
 			}
 			//アクティブな場合
 			timer = 0;
-			drawing = true;
+
+			if(delta_distance > 0.3f){
+				drawing = true;
+			}
 			
 			Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), RightHand.transform.position - newpos);
 			newpos = RightHand.transform.position;

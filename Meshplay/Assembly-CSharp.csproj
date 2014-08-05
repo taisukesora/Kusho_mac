@@ -63,6 +63,7 @@
      <Compile Include="Assets\KinectScripts\KinectInterop.cs" />
      <Compile Include="Assets\KinectScripts\KinectManager.cs" />
      <Compile Include="Assets\KinectScripts\KinectServer.cs" />
+     <Compile Include="Assets\ScreenRecorder.cs" />
      <Compile Include="Assets\Scripts\Camera_operation.cs" />
      <Compile Include="Assets\Scripts\CreateMesh.cs" />
      <Compile Include="Assets\Scripts\CreatePolygonMesh.cs" />
