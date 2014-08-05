@@ -46,9 +46,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Camera_operation.cs" />
-     <Compile Include="Assets\CreateMesh.cs" />
-     <Compile Include="Assets\CreatePolygonMesh.cs" />
      <Compile Include="Assets\GesturesDemo\Scripts\GestureListener.cs" />
      <Compile Include="Assets\GesturesDemo\Scripts\PresentationScript.cs" />
      <Compile Include="Assets\InteractionDemo\Scripts\GrabDropScript.cs" />
@@ -66,7 +63,10 @@
      <Compile Include="Assets\KinectScripts\KinectInterop.cs" />
      <Compile Include="Assets\KinectScripts\KinectManager.cs" />
      <Compile Include="Assets\KinectScripts\KinectServer.cs" />
-     <Compile Include="Assets\SimpleMeshRenderer.cs" />
+     <Compile Include="Assets\Scripts\Camera_operation.cs" />
+     <Compile Include="Assets\Scripts\CreateMesh.cs" />
+     <Compile Include="Assets\Scripts\CreatePolygonMesh.cs" />
+     <Compile Include="Assets\Scripts\SimpleMeshRenderer.cs" />
      <None Include="Assets\shaders\testShader.shader" />
   </ItemGroup>
   <ItemGroup>
