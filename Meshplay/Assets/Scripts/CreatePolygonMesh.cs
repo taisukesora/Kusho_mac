@@ -19,15 +19,16 @@ public class CreatePolygonMesh : MonoBehaviour {
 	
 	//
 	public GameObject RightHand;
-	private Vector3 newpos;
+	private Vector3 pos, newpos;
 	public float delta_distance;
 	public float weight2;
-	
+	public float noise_factor = 1.0f;
 	
 	//timer
 	private float timer;
 	private float waitingTime=0.01f;
 	public bool drawing;
+
 	
 	void Start () {
 		basevec = new Vector3[sections];
@@ -91,9 +92,14 @@ public class CreatePolygonMesh : MonoBehaviour {
 			{
 				return;
 			}
-			
+
+			newpos = RightHand.transform.position;
 			//距離が短すぎる場合
-			delta_distance = Vector3.Distance(newpos, RightHand.transform.position);
+			delta_distance = Vector3.Distance(pos, newpos);
+			pos = newpos;
+			newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
+
+
 			if(delta_distance < 0.1f)
 			{
 				return;
@@ -105,8 +111,7 @@ public class CreatePolygonMesh : MonoBehaviour {
 				drawing = true;
 			}
 			
-			Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), RightHand.transform.position - newpos);
-			newpos = RightHand.transform.position;
+			Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
 			int pathcount = path.Count-1;
 			path.Enqueue(newpos);
 			
