@@ -3,60 +3,72 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class CreatePolygonMesh : MonoBehaviour {
+
+	//variables for mesh
 	private Mesh mesh;
-	// Use this for initialization
 	Queue<Vector3> path = new Queue<Vector3>();
 	Queue<Vector3> newVertices = new Queue<Vector3>();
 	Queue<Vector2> newUV = new Queue<Vector2>();
 	Queue<int> newTriangles = new Queue<int>();
 	const int sections = 12;
-	//vectors
-	Vector3[] basevec;
-	
-	//
-	int count = 0;
-	public bool mousePointed = false;
-	
-	//
+	Vector3[] basevec = new Vector3[sections];
+
 	public GameObject RightHand;
 	private Vector3 pos, newpos;
-	public float delta_distance;
-	public float weight2;
+
+	//perlin noise factor can be set at inspector
 	public float noise_factor = 1.0f;
 	
-	//timer
-	private float timer;
+	//drawing at a certain interval
+	private float sum_time;
 	private float waitingTime=0.01f;
-	public bool drawing;
-
-	CubemanController script_cubeman;
-	bool Rhand_opening;
 	
+	CubemanController script_cubeman;
+	//Right hand opening judge
+	bool Rhand_opening;
+
+	bool first = true;
+
 	void Start () {
+		/*
+		if(RightHand.activeSelf==false)
+		{
+			Start ();
+			return;
+		}
+		*/
+
 		script_cubeman = GameObject.Find ("Cubeman").GetComponent<CubemanController>();
+		mesh = new Mesh();  
 
-		basevec = new Vector3[sections];
-		mesh = new Mesh();    
-		//初期path
-		path.Enqueue(RightHand.transform.position);
-
-		//点の設定
+		//正１２角形の中心から頂点へ向かう基本ベクトルの設定
 		for(int i=0;i<sections;i++){
 			basevec[i] = new Vector3(0.0f, Mathf.Cos (2*Mathf.PI*i/sections), Mathf.Sin(2*Mathf.PI*i/sections));
 		}
+
+		Init ();
+
+		/*
+		while(true){
+			if(Init ()){break;}
+		}
+		*/
+	}
+
+	bool Init(){
+		newpos = RightHand.transform.position;
+		//距離が短すぎる場合
+		float delta_distance = Vector3.Distance(Vector3.zero, newpos);
+		//if(delta_distance<0.1f){return false;}
+		//初期path
+		path.Enqueue(RightHand.transform.position);
+		Debug.Log ("newpos = "+newpos);
 
 		for(int i=0;i<sections;i++)
 		{
 			newVertices.Enqueue(path.Peek() + basevec[i]);
 			newUV.Enqueue(new Vector2(i/sections, 0.0f));
 		}
-		
-		//Triangles
-		/*
-    newTriangles.Enqueue(1);newTriangles.Enqueue(2);newTriangles.Enqueue(0);
-    newTriangles.Enqueue(2);newTriangles.Enqueue(3);newTriangles.Enqueue(0);
-    newTriangles.Enqueue(3);newTriangles.Enqueue(4);newTriangles.Enqueue(0);
-    */
 		
 		mesh.vertices = newVertices.ToArray();
 		mesh.uv = newUV.ToArray();
@@ -67,6 +79,7 @@ public class CreatePolygonMesh : MonoBehaviour {
 		
 		GetComponent<MeshFilter>().sharedMesh = mesh;
 		GetComponent<MeshFilter>().sharedMesh.name = "myMesh";
+		return true;
 	}
 	
 	// Update is called once per frame
@@ -84,12 +97,9 @@ public class CreatePolygonMesh : MonoBehaviour {
     newVertices.Clear();
     newVertices = new Queue<Vector3>(tmp);
 	*/
-		
-		//delta_distance = 0.0f;
-		
-		drawing = false;
-		timer += Time.deltaTime;
-		if(timer>waitingTime)
+
+		sum_time += Time.deltaTime;
+		if(sum_time > waitingTime)
 		{
 			//アクティブでない場合
 			if(!RightHand.activeSelf)
@@ -97,79 +107,55 @@ public class CreatePolygonMesh : MonoBehaviour {
 				return;
 			}
 			//if(script_cubeman.isRHandopen()==1){
-				newpos = RightHand.transform.position;
-				//距離が短すぎる場合
-				delta_distance = Vector3.Distance(pos, newpos);
-				Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
-				pos = newpos;
-				newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
+			newpos = RightHand.transform.position;
+			//距離が短すぎる場合
+			float delta_distance = Vector3.Distance(pos, newpos);
+			Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
+			pos = newpos;
+
+			//ノイズ要素
+			newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
 
 
-				if(delta_distance < 0.1f)
-				{
-					return;
-				}
-				//アクティブな場合
-				timer = 0;
+			if(delta_distance < 0.1f)
+			{
+				return;
+			}
+			//アクティブな場合
+			sum_time = 0;
 
-				if(delta_distance > 0.3f){
-					drawing = true;
-				}
-				
-				//Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
-				int pathcount = path.Count-1;
-				path.Enqueue(newpos);
-				
-				//点の設定
-				int vertcount = newVertices.Count-1;
-				weight2 = Mathf.Exp (-delta_distance*5);
-				//Debug.Log("weight ,delta_distance ="+ weight2); 
-				for(int i=0;i<sections;i++)
-				{
-					newVertices.Enqueue(rot*(weight2*basevec[i]) + newpos);
-					newUV.Enqueue(new Vector2(i/sections, 1.0f));
-				}
-				
-				//UV
-				
-				//Triangles
-				int tricount = newTriangles.Count-1;
-				//Debug.Log("triangle"+tricount);
-				if(path.Count<=1000)
-				{	  
-					//手が閉じている場合
-					if(script_cubeman.isRHandopen()==2){
-						//2連続で開いていると判定された場合
-						if(Rhand_opening){
-							for(int i = 0;i<sections*3;i++){
-								newTriangles.Enqueue(0);
-							}
-						}
-						else{
-							//初めての場合は閉じているときと同じように動作
-							Rhand_opening = true;
-							int indicesFrom = vertcount - (sections) + 1;
-							for(int i = 0; i < sections-1; i++){
-								newTriangles.Enqueue(indicesFrom + i);
-								newTriangles.Enqueue(indicesFrom + (sections) + i);
-								newTriangles.Enqueue(indicesFrom + (i+1));
-								
-								newTriangles.Enqueue(indicesFrom + (sections) + (i));
-								newTriangles.Enqueue(indicesFrom + (sections) + (i+1));
-								newTriangles.Enqueue(indicesFrom + (i+1));
-								
-							}
-							newTriangles.Enqueue(indicesFrom + sections -1);
-							newTriangles.Enqueue (indicesFrom + (sections)*2 -1);
-							newTriangles.Enqueue(indicesFrom);
-							
-							newTriangles.Enqueue(indicesFrom + sections*2 -1);
-							newTriangles.Enqueue (indicesFrom + (sections));
-							newTriangles.Enqueue(indicesFrom);
+			//Quaternion rot = Quaternion.FromToRotation(new Vector3(1.0f, 0.0f, 0.0f), newpos - pos);
+			int pathcount = path.Count-1;
+			path.Enqueue(newpos);
+			
+			//点の設定
+			int vertcount = newVertices.Count-1;
+			float weight = Mathf.Exp (-delta_distance*5);
+			//Debug.Log("weight ,delta_distance ="+ weight2); 
+			for(int i=0;i<sections;i++)
+			{
+				newVertices.Enqueue(rot*(weight*basevec[i]) + newpos);
+				newUV.Enqueue(new Vector2(i/sections, 1.0f));
+			}
+			
+			//UV
+			
+			//Triangles
+			int tricount = newTriangles.Count-1;
+			//Debug.Log("triangle"+tricount);
+			if(path.Count<=1000)
+			{
+				//手が閉じている場合
+				if(script_cubeman.isRHandopen()==2){
+					//2連続で開いていると判定された場合
+					if(Rhand_opening){
+						for(int i = 0;i<sections*3;i++){
+							newTriangles.Enqueue(0);
 						}
 					}
 					else{
-						//手が開いている場合
+						//初めての場合は閉じているときと同じように動作
+						Rhand_opening = true;
 						int indicesFrom = vertcount - (sections) + 1;
 						for(int i = 0; i < sections-1; i++){
 							newTriangles.Enqueue(indicesFrom + i);
@@ -188,22 +174,57 @@ public class CreatePolygonMesh : MonoBehaviour {
 						newTriangles.Enqueue(indicesFrom + sections*2 -1);
 						newTriangles.Enqueue (indicesFrom + (sections));
 						newTriangles.Enqueue(indicesFrom);
-					Rhand_opening = false;
-				}
-			}
-				else
-				{
-					//順にデキュー
-					path.Dequeue();
-					for(int i=0;i<sections;i++)
-					{
-						newVertices.Dequeue();
-						newUV.Dequeue();
-						newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
-						newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
 					}
 				}
-			//}
+				else{
+					//手が開いている場合
+					int indicesFrom = vertcount - (sections) + 1;
+					for(int i = 0; i < sections-1; i++){
+						newTriangles.Enqueue(indicesFrom + i);
+						newTriangles.Enqueue(indicesFrom + (sections) + i);
+						newTriangles.Enqueue(indicesFrom + (i+1));
+						
+						newTriangles.Enqueue(indicesFrom + (sections) + (i));
+						newTriangles.Enqueue(indicesFrom + (sections) + (i+1));
+						newTriangles.Enqueue(indicesFrom + (i+1));
+						
+					}
+					newTriangles.Enqueue(indicesFrom + sections -1);
+					newTriangles.Enqueue (indicesFrom + (sections)*2 -1);
+					newTriangles.Enqueue(indicesFrom);
+					
+					newTriangles.Enqueue(indicesFrom + sections*2 -1);
+					newTriangles.Enqueue (indicesFrom + (sections));
+					newTriangles.Enqueue(indicesFrom);
+				Rhand_opening = false;
+			}
+			}
+			else
+			{
+				//順にデキュー
+				path.Dequeue();
+				for(int i=0;i<sections;i++)
+				{
+					newVertices.Dequeue();
+					newUV.Dequeue();
+					newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
+					newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
+				}
+			}
+			/*
+			if(path.Count==2 && first){
+				path.Dequeue();
+				for(int i=0;i<sections;i++)
+				{
+					newVertices.Dequeue();
+					newUV.Dequeue();
+					//newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
+					//newTriangles.Dequeue();newTriangles.Dequeue();newTriangles.Dequeue();
+				}
+				Debug.Log("for the first time");
+				first = false;
+			}*/
+
 			mesh.Clear();
 			mesh.vertices = newVertices.ToArray();
 			mesh.uv = newUV.ToArray();
@@ -211,9 +232,6 @@ public class CreatePolygonMesh : MonoBehaviour {
 			mesh.RecalculateNormals();
 			mesh.RecalculateBounds();
 		}
-		count++;
-		
-		
 	}
 	
 	public void resetMesh()

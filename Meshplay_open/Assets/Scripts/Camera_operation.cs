@@ -89,13 +89,6 @@ public class Camera_operation : MonoBehaviour {
 				hand_opening = false;
 			}
 		}
-
-	if(!script.drawing && flag_camerarotation){
-    	//transform.RotateAround(new Vector3(0.0f, 10.0f, 0.0f), Vector3.up, 0.5f);
-	}
-	else{
-			//transform.RotateAround(new Vector3(0.0f, 10.0f, 0.0f), Vector3.up, 0.11f);
-	}
 	
 	//Space keyでreset
 	if (Input.GetKeyDown (KeyCode.Space)) {
