@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class Camera_operation : MonoBehaviour {
-	CreatePolygonMesh script;
+	CreatePolygonMesh script_mesh;
 	CubemanController script_cubeman;
   //float x;
   //float k;
@@ -11,12 +11,17 @@ public class Camera_operation : MonoBehaviour {
 	bool hand_opening = false;
 	Vector3 hand_pos_past;
 	public GameObject lefthand;
-	private bool isSpinning = false;
+	public bool isSpinning = false;
 	float sum_time;
 	float dir;
 
+	//angular velocity
+	public float w = 0.1f;
+	//center of the rotation
+	private Vector3 center;
+
   void Start () {
-    script = GameObject.Find("Drawing_l").GetComponent<CreatePolygonMesh>();
+    script_mesh = GameObject.Find("Drawing_l").GetComponent<CreatePolygonMesh>();
 	script_cubeman = GameObject.Find ("Cubeman").GetComponent<CubemanController>();
   }
   
@@ -34,6 +39,7 @@ public class Camera_operation : MonoBehaviour {
     */
 
 		if(isSpinning){
+			/*
 			//回転中の場合
 			if(sum_time<0.5f)
 			{
@@ -46,53 +52,19 @@ public class Camera_operation : MonoBehaviour {
 				isSpinning = false;
 				hand_opening = false;
 
-			}
+			}*/
+			//transform.RotateAround(new Vector3(0.0f, 10.0f, 0.0f), Vector3.up, dir*w);
+			transform.RotateAround(script_mesh.calc_centerofgravity(), Vector3.up, dir*w);
+			gesture();
 		}
 		else
 		{
-			//回転していない場合の場合
-			//isHandopen in cubeman script
-			if(script_cubeman.isLHandopen()==1){
-				if(hand_opening){
-					Vector3 delta = lefthand.transform.position - hand_pos_past;
-					hand_pos_past = lefthand.transform.position;
-					float vx = delta.x/Time.deltaTime;
-					float vy = delta.y/Time.deltaTime;
-
-					//右にスワイプ
-					if(vx>25.0f){
-						isSpinning = true;
-						dir = 1.0f;
-					}
-					//左にスワイプ
-					if(vx<-25.0f){
-						isSpinning = true;
-						dir = -1.0f;
-					}
-					//下にスワイプ
-					if(vy<-50.0f){
-						//メッシュリセット
-						script.resetMesh();
-						//カメラの位置もリセット
-						camera_reset();
-					}
-
-				}
-				else
-				{
-					hand_opening =true;
-					hand_pos_past = lefthand.transform.position;
-				}
-			}
-			else
-			{	
-				hand_opening = false;
-			}
+			gesture();
 		}
 	
 	//Space keyでreset
 	if (Input.GetKeyDown (KeyCode.Space)) {
-		script.resetMesh();
+		script_mesh.resetMesh();
 	}
 	//start to rotate
 	if(Input.GetKeyDown(KeyCode.Tab)){	
@@ -102,7 +74,49 @@ public class Camera_operation : MonoBehaviour {
   }
 
 	void camera_reset(){
-		transform.position = new Vector3(0, 13, -20);
-		transform.rotation = Quaternion.identity;
+		transform.position = new Vector3(0, 13, 20);
+		transform.rotation = Quaternion.Euler(0,180,0);
+		isSpinning = false;
+		dir = 0.0f;
+	}
+
+	void gesture(){
+		if(script_cubeman.isLHandopen()==1){
+			if(hand_opening){
+				Vector3 delta = lefthand.transform.position - hand_pos_past;
+				hand_pos_past = lefthand.transform.position;
+				float vx = delta.x/Time.deltaTime;
+				float vy = delta.y/Time.deltaTime;
+				
+				//右にスワイプ
+				if(vx>40.0f){
+					isSpinning = true;
+					dir = 1.0f;
+					
+				}
+				//左にスワイプ
+				if(vx<-40.0f){
+					isSpinning = true;
+					dir = -1.0f;
+				}
+				//下にスワイプ
+				if(vy<-40.0f){
+					//メッシュリセット
+					script_mesh.resetMesh();
+					//カメラの位置もリセット
+					camera_reset();
+				}
+				
+			}
+			else
+			{
+				hand_opening =true;
+				hand_pos_past = lefthand.transform.position;
+			}
+		}
+		else
+		{	
+			hand_opening = false;
+		}
 	}
 }

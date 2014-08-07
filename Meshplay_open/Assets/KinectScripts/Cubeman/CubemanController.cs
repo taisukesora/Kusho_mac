@@ -299,7 +299,7 @@ public class CubemanController : MonoBehaviour
 		float sqrdistance_hand_handtip = (Hand_Tip_Right.transform.position - Hand_Right.transform.position).sqrMagnitude;
 
 		//Hand Open
-		if(sqrdistance_hand_handtip*2 > 1.0f)
+		if(sqrdistance_hand_handtip*2 > 0.9f)
 		{
 			//Debug.Log(sqrdistance_hand_thumb+"  "+sqrdistance_hand_handtip);
 			//Debug.Log ("1  "+sqrdistance_hand_handtip);
@@ -325,7 +325,7 @@ public class CubemanController : MonoBehaviour
 		float sqrdistance_hand_handtip = (Hand_Tip_Left.transform.position - Hand_Left.transform.position).sqrMagnitude;
 		
 		//Hand Open
-		if(sqrdistance_hand_handtip*2 > 1.0f)
+		if(sqrdistance_hand_handtip*2 > 0.9f)
 		{
 			//Debug.Log(sqrdistance_hand_thumb+"  "+sqrdistance_hand_handtip);
 			//Debug.Log ("1  "+sqrdistance_hand_handtip);
