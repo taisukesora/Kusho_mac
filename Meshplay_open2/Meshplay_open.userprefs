@@ -1,0 +1,14 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Camera_operation.cs">
+    <Files>
+      <File FileName="Assets\Scripts\CreatePolygonMesh.cs" Line="212" Column="17" />
+      <File FileName="Assets\KinectScripts\Cubeman\CubemanController.cs" Line="327" Column="14" />
+      <File FileName="Assets\Scripts\Camera_operation.cs" Line="80" Column="9" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
