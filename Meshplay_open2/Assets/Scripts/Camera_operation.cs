@@ -17,8 +17,10 @@ public class Camera_operation : MonoBehaviour {
 
 	//angular velocity
 	public float w = 0.1f;
+	public float sum_theta;
 	//center of the rotation
 	private Vector3 center;
+
 
   void Start () {
     script_mesh = GameObject.Find("Drawing_l").GetComponent<CreatePolygonMesh>();
@@ -55,6 +57,12 @@ public class Camera_operation : MonoBehaviour {
 			}*/
 			//transform.RotateAround(new Vector3(0.0f, 10.0f, 0.0f), Vector3.up, dir*w);
 			transform.RotateAround(script_mesh.calc_centerofgravity(), Vector3.up, dir*w);
+			sum_theta += dir*w;
+			Debug.Log (sum_theta);
+			if(Mathf.Abs (sum_theta)> 360)
+			{
+				isSpinning = false;
+			}
 			gesture();
 		}
 		else
@@ -91,17 +99,19 @@ public class Camera_operation : MonoBehaviour {
 
 				float vx = delta.x/Time.deltaTime;
 				float vy = delta.y/Time.deltaTime;
-				
+
+				int pathCount = script_mesh.getPathCount();
 				//右にスワイプ
-				if(vx>40.0f){
+				if(vx>40.0f && pathCount>10){
 					isSpinning = true;
 					dir = 1.0f;
-					
+					sum_theta = 0;
 				}
 				//左にスワイプ
-				if(vx<-40.0f){
+				if(vx<-40.0f && pathCount>10){
 					isSpinning = true;
 					dir = -1.0f;
+					sum_theta = 0;
 				}
 
 				if(!isSpinning){
@@ -109,7 +119,7 @@ public class Camera_operation : MonoBehaviour {
 				}
 
 				//下にスワイプ
-				if(vy<-40.0f){
+				if(vy<-50.0f){
 					//メッシュリセット
 					script_mesh.resetMesh();
 					//カメラの位置もリセット

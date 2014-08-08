@@ -108,7 +108,7 @@ public class CreatePolygonMesh : MonoBehaviour {
 			pos = newpos;
 
 			//ノイズ要素(noise_factorで決定
-			newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x, RightHand.transform.position.y)));
+			newpos += noise_factor* (new Vector3(0.0f, 0.0f, Mathf.PerlinNoise (RightHand.transform.position.x/4, RightHand.transform.position.y/4)));
 
 			//pathに追加
 			path.Enqueue(newpos);
@@ -234,5 +234,9 @@ public class CreatePolygonMesh : MonoBehaviour {
 		g /= tmp.Length;
 		//Debug.Log (g);
 		return g;
+	}
+
+	public int getPathCount(){
+		return path.Count;
 	}
 }
